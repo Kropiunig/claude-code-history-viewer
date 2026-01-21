@@ -27,11 +27,12 @@ import { layout } from "@/components/renderers";
 interface ToolExecutionResultRouterProps {
   toolResult: Record<string, unknown> | string;
   depth: number;
+  searchQuery?: string;
 }
 
 export const ToolExecutionResultRouter: React.FC<
   ToolExecutionResultRouterProps
-> = ({ toolResult }) => {
+> = ({ toolResult, searchQuery }) => {
   const { t } = useTranslation("components");
   // Helper function to check if content is JSONL Claude session history
   const isClaudeSessionHistory = (content: string): boolean => {
@@ -93,7 +94,7 @@ export const ToolExecutionResultRouter: React.FC<
       return <ClaudeSessionHistoryRenderer content={toolResult} />;
     }
 
-    return <StringRenderer result={toolResult} />;
+    return <StringRenderer result={toolResult} searchQuery={searchQuery} />;
   }
 
   // Handle Claude Code specific formats first
@@ -205,7 +206,7 @@ export const ToolExecutionResultRouter: React.FC<
       return <ClaudeSessionHistoryRenderer content={fileData.content} />;
     }
 
-    return <FileContent fileData={fileData} title={t("toolResult.fileContent")} />;
+    return <FileContent fileData={fileData} title={t("toolResult.fileContent")} searchQuery={searchQuery} />;
   }
 
   // Handle file edit results
@@ -238,7 +239,7 @@ export const ToolExecutionResultRouter: React.FC<
 
   // Handle content array with text objects (Claude API response)
   if (Array.isArray(toolResult.content) && toolResult.content.length > 0) {
-    return <ContentArrayRenderer toolResult={toolResult} />;
+    return <ContentArrayRenderer toolResult={toolResult} searchQuery={searchQuery} />;
   }
 
   // Handle direct content as string (non-chat history)
@@ -248,7 +249,7 @@ export const ToolExecutionResultRouter: React.FC<
     !toolResult.stdout &&
     !toolResult.stderr
   ) {
-    return <StringRenderer result={toolResult.content} />;
+    return <StringRenderer result={toolResult.content} searchQuery={searchQuery} />;
   }
 
   // Handle generic structured results with various properties

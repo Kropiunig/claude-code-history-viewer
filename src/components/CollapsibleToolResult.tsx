@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ToolExecutionResultRouter } from "./messageRenderer";
@@ -13,6 +13,7 @@ type Props = {
   toolUse?: Record<string, unknown>;
   toolResult: unknown;
   defaultExpanded?: boolean;
+  searchQuery?: string;
 };
 
 const isSmallResult = (result: unknown): boolean => {
@@ -91,11 +92,22 @@ export const CollapsibleToolResult = ({
   toolUse,
   toolResult,
   defaultExpanded,
+  searchQuery,
 }: Props) => {
   const { t } = useTranslation("components");
   const toolName = getToolName(toolUse, toolResult, t);
   const shouldExpandByDefault = defaultExpanded ?? isSmallResult(toolResult);
   const [isExpanded, setIsExpanded] = useState(shouldExpandByDefault);
+
+  // 검색 쿼리가 있고 내용에 매칭되면 자동으로 펼치기
+  useEffect(() => {
+    if (searchQuery) {
+      const resultStr = typeof toolResult === "string" ? toolResult : JSON.stringify(toolResult);
+      if (resultStr.toLowerCase().includes(searchQuery.toLowerCase())) {
+        setIsExpanded(true);
+      }
+    }
+  }, [searchQuery, toolResult]);
 
   const summary = getResultSummary(toolResult, t);
 

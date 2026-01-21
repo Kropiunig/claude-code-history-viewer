@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Terminal, CheckCircle, AlertCircle, Info, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Markdown from "react-markdown";
@@ -9,6 +9,7 @@ import { layout } from "@/components/renderers";
 
 type Props = {
   text: string;
+  searchQuery?: string;
 };
 
 interface CommandGroup {
@@ -27,7 +28,7 @@ interface CaveatBlock {
   content: string;
 }
 
-export const CommandRenderer = ({ text }: Props) => {
+export const CommandRenderer = ({ text, searchQuery }: Props) => {
   const { t } = useTranslation("components");
 
   // Command 그룹 (name, message, args) 추출
@@ -215,7 +216,7 @@ export const CommandRenderer = ({ text }: Props) => {
 
       {/* Caveats - collapsible info blocks */}
       {caveats.map((caveat, index) => (
-        <CaveatRenderer key={index} content={caveat.content} />
+        <CaveatRenderer key={index} content={caveat.content} searchQuery={searchQuery} />
       ))}
 
       {/* Remaining Text */}
@@ -230,9 +231,16 @@ export const CommandRenderer = ({ text }: Props) => {
   );
 };
 
-const CaveatRenderer = ({ content }: { content: string }) => {
+const CaveatRenderer = ({ content, searchQuery }: { content: string; searchQuery?: string }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { t } = useTranslation("components");
+
+  // 검색 쿼리가 있고 내용에 매칭되면 자동으로 펼치기
+  useEffect(() => {
+    if (searchQuery && content.toLowerCase().includes(searchQuery.toLowerCase())) {
+      setIsExpanded(true);
+    }
+  }, [searchQuery, content]);
 
   return (
     <div className={cn(layout.rounded, "border bg-info/10 border-info/30")}>

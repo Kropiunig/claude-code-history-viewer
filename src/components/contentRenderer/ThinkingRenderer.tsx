@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bot, ChevronRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -6,11 +6,19 @@ import { layout } from "@/components/renderers";
 
 type Props = {
   thinking: string;
+  searchQuery?: string;
 };
 
-export const ThinkingRenderer = ({ thinking }: Props) => {
+export const ThinkingRenderer = ({ thinking, searchQuery }: Props) => {
   const { t } = useTranslation("components");
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // 검색 쿼리가 있고 내용에 매칭되면 자동으로 펼치기
+  useEffect(() => {
+    if (searchQuery && thinking.toLowerCase().includes(searchQuery.toLowerCase())) {
+      setIsExpanded(true);
+    }
+  }, [searchQuery, thinking]);
 
   if (!thinking) return null;
 

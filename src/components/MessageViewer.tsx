@@ -546,7 +546,7 @@ const ClaudeMessageNode = React.memo(({ message, isCurrentMatch, isMatch, search
 
           {/* Tool Result */}
           {message.toolUseResult && (
-            <ToolExecutionResultRouter toolResult={message.toolUseResult} depth={0} />
+            <ToolExecutionResultRouter toolResult={message.toolUseResult} depth={0} searchQuery={searchQuery} />
           )}
         </div>
       </div>

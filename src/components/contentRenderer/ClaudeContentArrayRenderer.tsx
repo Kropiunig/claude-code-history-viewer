@@ -97,7 +97,7 @@ export const ClaudeContentArrayRenderer = ({
 
           case "thinking":
             if (typeof item.thinking === "string") {
-              return <ThinkingRenderer key={index} thinking={item.thinking} />;
+              return <ThinkingRenderer key={index} thinking={item.thinking} searchQuery={searchQuery} />;
             }
             return null;
 

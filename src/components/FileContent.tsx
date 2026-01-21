@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FileText } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -14,9 +14,11 @@ import { layout } from "@/components/renderers";
 export const FileContent = ({
   fileData,
   title,
+  searchQuery,
 }: {
   fileData: Record<string, unknown>;
   title: string;
+  searchQuery?: string;
 }) => {
   const { t } = useTranslation("components");
   const { renderCopyButton } = useCopyButton();
@@ -146,6 +148,13 @@ export const FileContent = ({
   // 접기/펼치기 상태 관리
   const [isExpanded, setIsExpanded] = useState(false);
   const MAX_LINES = 20; // 최대 표시 줄 수
+
+  // 검색 쿼리가 있고 내용에 매칭되면 자동으로 펼치기
+  useEffect(() => {
+    if (searchQuery && content.toLowerCase().includes(searchQuery.toLowerCase())) {
+      setIsExpanded(true);
+    }
+  }, [searchQuery, content]);
   const contentLines = content.split("\n");
   const shouldCollapse = contentLines.length > MAX_LINES;
   const displayContent =

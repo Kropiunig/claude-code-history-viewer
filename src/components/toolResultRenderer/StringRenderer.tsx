@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Folder, Check, FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
@@ -11,9 +11,10 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   result: string;
+  searchQuery?: string;
 };
 
-export const StringRenderer = ({ result }: Props) => {
+export const StringRenderer = ({ result, searchQuery }: Props) => {
   const { t } = useTranslation("components");
   // 파일 트리나 디렉토리 구조인지 확인
   const isFileTree =
@@ -22,6 +23,13 @@ export const StringRenderer = ({ result }: Props) => {
 
   // 접기/펼치기 상태 관리
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // 검색 쿼리가 있고 내용에 매칭되면 자동으로 펼치기
+  useEffect(() => {
+    if (searchQuery && result.toLowerCase().includes(searchQuery.toLowerCase())) {
+      setIsExpanded(true);
+    }
+  }, [searchQuery, result]);
   const MAX_LINES = 15; // 최대 표시 줄 수
   const resultLines = result.split("\n");
   const shouldCollapse = resultLines.length > MAX_LINES;

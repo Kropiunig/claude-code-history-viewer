@@ -16,9 +16,10 @@ import { getVariantStyles, layout, safeStringify } from "../renderers";
 
 interface ContentArrayRendererProps {
   toolResult: Record<string, unknown>;
+  searchQuery?: string;
 }
 
-export const ContentArrayRenderer = ({ toolResult }: ContentArrayRendererProps) => {
+export const ContentArrayRenderer = ({ toolResult, searchQuery }: ContentArrayRendererProps) => {
   const { t } = useTranslation("components");
   const styles = getVariantStyles("info");
 
@@ -155,7 +156,7 @@ export const ContentArrayRenderer = ({ toolResult }: ContentArrayRendererProps) 
                     <div className={layout.prose}>
                       {itemObj.text.includes("<thinking>") &&
                       itemObj.text.includes("</thinking>") ? (
-                        <ThinkingRenderer thinking={itemObj.text} />
+                        <ThinkingRenderer thinking={itemObj.text} searchQuery={searchQuery} />
                       ) : (
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {itemObj.text}

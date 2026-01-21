@@ -27,6 +27,64 @@ Claude Code History Viewer is a Tauri-based desktop application that allows user
 - `pnpm build` - Build frontend with TypeScript checking
 - `pnpm tauri:build` - Build production desktop application
 - `pnpm lint` - Run ESLint on the codebase
+- `just sync-version` - Sync version from package.json to Cargo.toml and tauri.conf.json
+
+## Version Management
+
+This is a **Tauri desktop application** distributed via GitHub Releases (not npm).
+
+### Single Source of Truth
+
+**`package.json`** is the single source of truth for version numbers.
+
+```
+package.json (원본)
+    ↓ just sync-version
+├── src-tauri/Cargo.toml
+└── src-tauri/tauri.conf.json
+```
+
+### Version Bump Guide
+
+```bash
+# 방법 1: npm version 사용 (npm 배포 아님, 버전 번호만 변경)
+npm version prerelease --preid=beta --no-git-tag-version
+# package.json: 1.0.0-beta.4 → 1.0.0-beta.5
+
+# 방법 2: 수동으로 package.json 편집
+# "version": "1.0.0-beta.5"
+
+# 버전 동기화 (필수)
+just sync-version
+```
+
+### Release Process
+
+```bash
+# 1. 버전 업데이트
+npm version prerelease --preid=beta --no-git-tag-version
+
+# 2. 버전 동기화
+just sync-version
+
+# 3. 커밋 및 태그
+git add -A
+git commit -m "chore: bump version to 1.0.0-beta.5"
+git tag v1.0.0-beta.5
+git push && git push --tags
+```
+
+GitHub Actions가 자동으로:
+1. 멀티플랫폼 빌드 (macOS, Windows, Linux)
+2. `latest.json` 생성 (Tauri 업데이터용)
+3. GitHub Release 발행
+
+### Auto-Update System
+
+- **업데이트 체크**: `src-tauri/src/commands/update.rs`
+- **프론트엔드 훅**: `src/hooks/useGitHubUpdater.ts`, `src/hooks/useSmartUpdater.ts`
+- **Tauri 설정**: `src-tauri/tauri.conf.json` (updater plugin)
+- **CI/CD**: `.github/workflows/updater-release.yml`
 
 ## Architecture
 

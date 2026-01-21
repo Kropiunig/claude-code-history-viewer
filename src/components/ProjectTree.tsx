@@ -12,9 +12,12 @@ import {
   Hash,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import "overlayscrollbars/overlayscrollbars.css";
 import type { ClaudeProject, ClaudeSession } from "../types";
 import { cn } from "@/lib/utils";
 import { getLocale } from "../utils/time";
+import "./ProjectTree.css";
 
 interface ProjectTreeProps {
   projects: ClaudeProject[];
@@ -122,7 +125,16 @@ export const ProjectTree: React.FC<ProjectTreeProps> = ({
       </div>
 
       {/* Projects List */}
-      <div className="relative flex-1 overflow-y-auto scrollbar-thin py-2">
+      <OverlayScrollbarsComponent
+        className="relative flex-1 py-2"
+        options={{
+          scrollbars: {
+            theme: "os-theme-custom",
+            autoHide: "leave",
+            autoHideDelay: 400,
+          },
+        }}
+      >
         {projects.length === 0 ? (
           <div className="px-4 py-12 text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-muted/30 flex items-center justify-center">
@@ -351,7 +363,7 @@ export const ProjectTree: React.FC<ProjectTreeProps> = ({
             })}
           </div>
         )}
-      </div>
+      </OverlayScrollbarsComponent>
 
       {/* Sidebar Footer */}
       <div className="relative px-4 py-3 border-t border-accent/20 bg-gradient-to-r from-accent/5 via-accent/10 to-accent/5">

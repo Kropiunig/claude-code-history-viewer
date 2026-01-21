@@ -754,6 +754,7 @@
     scrollbar-color: oklch(0.35 0.02 260) transparent;
   }
 
+
   /* === Glass Morphism System === */
   .glass {
     background: var(--glass-bg);
@@ -1830,4 +1831,58 @@
       break-inside: avoid;
     }
   }
+}
+
+/* ============================================
+   SIDEBAR SCROLLBAR (Outside @layer for highest priority)
+   ============================================ */
+.scrollbar-sidebar {
+  scrollbar-width: thin !important;
+  scrollbar-color: #6366f1 #1a1a2e !important;
+}
+
+.scrollbar-sidebar::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
+}
+
+.scrollbar-sidebar::-webkit-scrollbar-track {
+  background: #1a1a2e !important;
+  border-radius: 8px !important;
+}
+
+.scrollbar-sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%) !important;
+  border-radius: 8px !important;
+  border: 2px solid #1a1a2e !important;
+}
+
+.scrollbar-sidebar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #818cf8 0%, #6366f1 100%) !important;
+}
+
+.scrollbar-sidebar::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, #a5b4fc 0%, #818cf8 100%) !important;
+}
+
+.scrollbar-sidebar::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* Light theme */
+:root:not(.dark) .scrollbar-sidebar {
+  scrollbar-color: #6366f1 #e2e8f0 !important;
+}
+
+:root:not(.dark) .scrollbar-sidebar::-webkit-scrollbar-track {
+  background: #e2e8f0 !important;
+}
+
+:root:not(.dark) .scrollbar-sidebar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%) !important;
+  border-color: #e2e8f0 !important;
+}
+
+:root:not(.dark) .scrollbar-sidebar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #4f46e5 0%, #4338ca 100%) !important;
 }

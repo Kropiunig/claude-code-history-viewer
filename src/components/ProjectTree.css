@@ -1,0 +1,42 @@
+/* OverlayScrollbars Custom Theme */
+.os-theme-custom {
+  --os-size: 10px;
+  --os-padding-perpendicular: 2px;
+  --os-padding-axis: 2px;
+  --os-track-border-radius: 5px;
+  --os-handle-border-radius: 5px;
+  --os-handle-bg: #6366f1;
+  --os-handle-bg-hover: #818cf8;
+  --os-handle-bg-active: #a5b4fc;
+}
+
+.os-theme-custom .os-scrollbar {
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.os-theme-custom .os-scrollbar-track {
+  background: #0d0d14;
+  border-radius: 5px;
+}
+
+.os-theme-custom .os-scrollbar-handle {
+  background: linear-gradient(180deg, #6366f1, #4f46e5);
+  border-radius: 5px;
+}
+
+.os-theme-custom .os-scrollbar-handle:hover {
+  background: linear-gradient(180deg, #818cf8, #6366f1);
+}
+
+.os-theme-custom .os-scrollbar-handle:active {
+  background: linear-gradient(180deg, #a5b4fc, #818cf8);
+}
+
+/* Light theme support */
+:root:not(.dark) .os-theme-custom .os-scrollbar-track {
+  background: #e2e8f0;
+}
+
+:root:not(.dark) .os-theme-custom .os-scrollbar-handle {
+  background: linear-gradient(180deg, #6366f1, #4f46e5);
+}

@@ -4,7 +4,7 @@
   "folderPicker.folderSelectError": "Folder selection failed:",
   "folderPicker.folderSelectErrorDetails": "An error occurred while selecting the folder.\n- Check folder access permissions.\n- Verify Claude app is running or restart the app.\n- Ensure the folder path is correct on your system.",
   "folderPicker.help": "Help",
-  "folderPicker.helpDetails": "• Claude Desktop app must be run at least once to create the folder\n• Windows: C:\\Users\\[username]\\.claude\n• macOS/Linux: ~/.claude or /Users/[username]/.claude\n• macOS: /Users/[username]/.claude\n• Windows: C:\\Users\\[username]\\.claude\n• Linux: /home/[username]/.claude",
+  "folderPicker.helpDetails": "• Claude Desktop app must be run at least once to create the folder\n• Windows: C:\\Users\\[username]\\.claude\n• macOS: /Users/[username]/.claude or ~/.claude\n• Linux: /home/[username]/.claude or ~/.claude",
   "folderPicker.homeNotFound": "Could not find .claude folder in home directory. Please select the .claude folder or a parent folder containing it.",
   "folderPicker.invalidFolder": "Cannot find Claude data in the selected folder. Please select the .claude folder.",
   "folderPicker.newFolder": "Select a new Claude folder or parent folder.",

@@ -48,7 +48,7 @@
   "messageViewer.priorContext": "先前上下文",
   "messageViewer.refresh": "刷新",
   "messageViewer.renderError": "消息渲染错误",
-  "messageViewer.reply": "回复 (depth: {{depth}})",
+  "messageViewer.reply": "回复（深度：{{depth}}）",
   "messageViewer.scrollToBottom": "滚动到底部",
   "messageViewer.scrollToTop": "滚动到顶部",
   "messageViewer.searchPlaceholder": "搜索对话...",

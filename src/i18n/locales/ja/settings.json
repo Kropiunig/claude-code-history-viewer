@@ -4,7 +4,7 @@
   "folderPicker.folderSelectError": "フォルダ選択失敗：",
   "folderPicker.folderSelectErrorDetails": "フォルダの選択中にエラーが発生しました。\n- フォルダアクセス権限を確認してください。\n- Claudeアプリが動作中であることを確認するか、アプリを再起動してください。\n- システムでフォルダパスが正しいことを確認してください。",
   "folderPicker.help": "ヘルプ",
-  "folderPicker.helpDetails": "• Claude Desktopアプリを一度でも実行してフォルダを作成する必要があります\n• Windows: C:\\Users\\[ユーザー名]\\.claude\n• macOS/Linux: ~/.claude または /Users/[ユーザー名]/.claude\n• macOS: /Users/[ユーザー名]/.claude\n• Windows: C:\\Users\\[ユーザー名]\\.claude\n• Linux: /home/[ユーザー名]/.claude",
+  "folderPicker.helpDetails": "• Claude Desktopアプリを一度でも実行してフォルダを作成する必要があります\n• Windows: C:\\Users\\[ユーザー名]\\.claude\n• macOS: /Users/[ユーザー名]/.claude または ~/.claude\n• Linux: /home/[ユーザー名]/.claude または ~/.claude",
   "folderPicker.homeNotFound": "ホームディレクトリで.claudeフォルダが見つかりませんでした。.claudeフォルダまたはそれを含む親フォルダを選択してください。",
   "folderPicker.invalidFolder": "選択したフォルダにClaudeデータが見つかりません。.claudeフォルダを選択してください。",
   "folderPicker.newFolder": "新しいClaudeフォルダまたは親フォルダを選択してください。",

@@ -222,7 +222,7 @@ src/i18n/
 | `tools` | tools, toolResult, toolUseRenderer, collapsibleToolResult | ~69 |
 | `error` | error | ~37 |
 | `message` | message, messages, messageViewer, messageContentDisplay | ~66 |
-| `renderers` | *Renderer, *Display (각종 렌더러) | ~255 |
+| `renderers` | advancedTextDiff, agentProgressGroup, agentTaskGroup, assistantMessageDetails, bashCodeExecutionToolResultRenderer, captureMode, citationRenderer, claudeContentArrayRenderer, claudeSessionHistoryRenderer, claudeToolUseDisplay, codeExecutionToolResultRenderer, codebaseContextRenderer, commandOutputDisplay, commandRenderer, contentArray, diffViewer, fileContent, fileEditRenderer, fileHistorySnapshotRenderer, fileListRenderer, gitWorkflowRenderer, globalSearch, imageRenderer, mcpRenderer, progressRenderer, queueOperationRenderer, structuredPatch, summaryMessageRenderer, systemMessageRenderer, taskNotification, taskOperation, terminalStreamRenderer, textEditorCodeExecutionToolResultRenderer, thinkingRenderer, toolSearchToolResultRenderer, webFetchToolResultRenderer, webSearchRenderer | ~255 |
 | `update` | updateModal, updateSettingsModal, simpleUpdateModal 등 | ~65 |
 | `feedback` | feedback | ~32 |
 | `recentEdits` | recentEdits | ~20 |

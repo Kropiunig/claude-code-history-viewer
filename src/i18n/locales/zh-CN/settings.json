@@ -4,7 +4,7 @@
   "folderPicker.folderSelectError": "文件夹选择失败：",
   "folderPicker.folderSelectErrorDetails": "选择文件夹时发生错误。\n- 请检查文件夹访问权限。\n- 确认Claude应用正在运行或尝试重新启动应用。\n- 确认系统中的文件夹路径是否正确。",
   "folderPicker.help": "帮助",
-  "folderPicker.helpDetails": "• 需要先运行Claude Desktop应用才能创建文件夹\n• Windows: C:\\Users\\[用户名]\\.claude\n• macOS/Linux: ~/.claude 或 /Users/[用户名]/.claude\n• macOS: /Users/[用户名]/.claude\n• Windows: C:\\Users\\[用户名]\\.claude\n• Linux: /home/[用户名]/.claude",
+  "folderPicker.helpDetails": "• 需要先运行Claude Desktop应用才能创建文件夹\n• Windows: C:\\Users\\[用户名]\\.claude\n• macOS: /Users/[用户名]/.claude 或 ~/.claude\n• Linux: /home/[用户名]/.claude 或 ~/.claude",
   "folderPicker.homeNotFound": "在主目录中找不到.claude文件夹。请选择.claude文件夹或包含它的上级文件夹。",
   "folderPicker.invalidFolder": "在选择的文件夹中找不到Claude数据。请选择.claude文件夹。",
   "folderPicker.newFolder": "请选择新的Claude文件夹或其上级文件夹。",

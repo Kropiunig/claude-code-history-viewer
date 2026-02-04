@@ -150,12 +150,12 @@ for (const lang of langDirs) {
 
   if (missingInTarget.length > 0) {
     error(
-      `${lang}: en 대비 누락 키 ${missingInTarget.length}개 → ${missingInTarget.slice(0, 5).join(", ")}${missingInTarget.length > 5 ? "..." : ""}`
+      `${lang}: ${BASE_LANG} 대비 누락 키 ${missingInTarget.length}개 → ${missingInTarget.slice(0, 5).join(", ")}${missingInTarget.length > 5 ? "..." : ""}`
     );
   }
   if (extraInTarget.length > 0) {
     warn(
-      `${lang}: en에 없는 추가 키 ${extraInTarget.length}개 → ${extraInTarget.slice(0, 5).join(", ")}${extraInTarget.length > 5 ? "..." : ""}`
+      `${lang}: ${BASE_LANG}에 없는 추가 키 ${extraInTarget.length}개 → ${extraInTarget.slice(0, 5).join(", ")}${extraInTarget.length > 5 ? "..." : ""}`
     );
   }
   if (missingInTarget.length === 0 && extraInTarget.length === 0) {

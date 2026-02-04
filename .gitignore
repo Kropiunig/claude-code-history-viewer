@@ -64,3 +64,6 @@ debug.log*
 
 /.mise
 .omc/
+
+# Auto-generated Claude memory files in locale directories
+src/i18n/locales/**/CLAUDE.md

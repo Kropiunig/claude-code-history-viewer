@@ -193,8 +193,9 @@ export const SessionItem: React.FC<SessionItemProps> = ({
     []
   );
 
-  // Handle delete success — refresh sessions list
+  // Handle delete success — refresh sessions list and notify
   const handleDeleteSuccess = useCallback(async () => {
+    toast.success(t("session.delete.success", "Session deleted"));
     const { selectedProject, selectProject, selectedSession, setSelectedSession } = useAppStore.getState();
     // Clear selection if the deleted session was selected
     if (selectedSession?.session_id === session.session_id) {
@@ -204,7 +205,22 @@ export const SessionItem: React.FC<SessionItemProps> = ({
     if (selectedProject) {
       await selectProject(selectedProject);
     }
-  }, [session.session_id]);
+  }, [session.session_id, t]);
+
+  // Delete key shortcut — only when this session is selected and not editing
+  useEffect(() => {
+    if (!isSelected || isEditing) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Delete" && !isDeleteDialogOpen && !isNativeRenameOpen && !isContextMenuOpen) {
+        e.preventDefault();
+        setIsDeleteDialogOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isSelected, isEditing, isDeleteDialogOpen, isNativeRenameOpen, isContextMenuOpen]);
 
   // Handle native rename success
   const handleNativeRenameSuccess = useCallback(

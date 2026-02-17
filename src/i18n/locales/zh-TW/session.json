@@ -146,5 +146,8 @@
   "session.delete.confirm": "刪除",
   "session.delete.deleting": "刪除中...",
   "session.delete.success": "工作階段已刪除",
-  "session.delete.error": "刪除工作階段失敗"
+  "session.delete.error": "刪除工作階段失敗",
+  "session.continue.menuItem": "在終端機中繼續",
+  "session.continue.success": "已在終端機中開啟",
+  "session.continue.error": "無法開啟終端機"
 }

@@ -21,7 +21,7 @@ use crate::commands::{
     session::{
         delete_session, get_recent_edits, get_session_message_count, load_project_sessions,
         load_session_messages, load_session_messages_paginated, rename_session_native,
-        reset_session_native_name, restore_file, search_messages,
+        reset_session_native_name, restore_file, resume_session, search_messages,
     },
     settings::{delete_preset, get_preset, load_presets, save_preset},
     stats::{
@@ -115,6 +115,8 @@ pub fn run() {
             reset_session_native_name,
             // Session deletion command
             delete_session,
+            // Session resume command
+            resume_session,
             // File watcher commands
             start_file_watcher,
             stop_file_watcher

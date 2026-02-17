@@ -146,5 +146,8 @@
   "session.delete.confirm": "削除",
   "session.delete.deleting": "削除中...",
   "session.delete.success": "セッションが削除されました",
-  "session.delete.error": "セッションの削除に失敗しました"
+  "session.delete.error": "セッションの削除に失敗しました",
+  "session.continue.menuItem": "ターミナルで続行",
+  "session.continue.success": "ターミナルで開きました",
+  "session.continue.error": "ターミナルを開けませんでした"
 }

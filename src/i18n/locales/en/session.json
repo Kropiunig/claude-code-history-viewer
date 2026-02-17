@@ -146,5 +146,8 @@
   "session.delete.confirm": "Delete",
   "session.delete.deleting": "Deleting...",
   "session.delete.success": "Session deleted",
-  "session.delete.error": "Failed to delete session"
+  "session.delete.error": "Failed to delete session",
+  "session.continue.menuItem": "Continue in terminal",
+  "session.continue.success": "Opened in terminal",
+  "session.continue.error": "Failed to open terminal"
 }

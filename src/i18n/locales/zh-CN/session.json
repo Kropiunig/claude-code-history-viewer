@@ -146,5 +146,8 @@
   "session.delete.confirm": "删除",
   "session.delete.deleting": "删除中...",
   "session.delete.success": "会话已删除",
-  "session.delete.error": "删除会话失败"
+  "session.delete.error": "删除会话失败",
+  "session.continue.menuItem": "在终端中继续",
+  "session.continue.success": "已在终端中打开",
+  "session.continue.error": "无法打开终端"
 }

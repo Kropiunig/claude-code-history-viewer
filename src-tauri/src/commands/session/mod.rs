@@ -10,6 +10,7 @@ mod delete;
 mod edits;
 mod load;
 mod rename;
+mod resume;
 mod search;
 
 // Re-export all commands
@@ -17,4 +18,5 @@ pub use delete::*;
 pub use edits::*;
 pub use load::*;
 pub use rename::*;
+pub use resume::*;
 pub use search::*;

@@ -146,5 +146,8 @@
   "session.delete.confirm": "삭제",
   "session.delete.deleting": "삭제 중...",
   "session.delete.success": "세션이 삭제되었습니다",
-  "session.delete.error": "세션 삭제에 실패했습니다"
+  "session.delete.error": "세션 삭제에 실패했습니다",
+  "session.continue.menuItem": "터미널에서 계속",
+  "session.continue.success": "터미널에서 열림",
+  "session.continue.error": "터미널 열기 실패"
 }

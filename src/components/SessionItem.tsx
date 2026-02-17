@@ -11,11 +11,13 @@ import {
   Check,
   RotateCcw,
   Link2,
+  Play,
   Terminal,
   Trash2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { invoke } from "@tauri-apps/api/core";
 import type { ClaudeSession } from "../types";
 import { cn } from "@/lib/utils";
 import {
@@ -181,6 +183,23 @@ export const SessionItem: React.FC<SessionItemProps> = ({
       setIsNativeRenameOpen(true);
     },
     []
+  );
+
+  // Handle continue/resume session in terminal
+  const handleContinueClick = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setIsContextMenuOpen(false);
+      const sessionId = session.actual_session_id || session.session_id;
+      try {
+        await invoke("resume_session", { sessionId });
+        toast.success(t("session.continue.success", "Opened in terminal"));
+      } catch (error) {
+        toast.error(t("session.continue.error", "Failed to open terminal"));
+        console.error("Failed to resume session:", error);
+      }
+    },
+    [session.actual_session_id, session.session_id, t]
   );
 
   // Handle delete action
@@ -398,6 +417,11 @@ export const SessionItem: React.FC<SessionItemProps> = ({
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuItem onClick={handleContinueClick}>
+                    <Play className="w-3 h-3 mr-2" />
+                    {t("session.continue.menuItem", "Continue in terminal")}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleRenameClick}>
                     <Pencil className="w-3 h-3 mr-2" />
                     {t("session.rename", "Rename")}

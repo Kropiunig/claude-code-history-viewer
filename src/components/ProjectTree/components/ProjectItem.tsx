@@ -22,11 +22,16 @@ export const ProjectItem: React.FC<ProjectItemProps> = ({
   const isWorktree = variant === "worktree";
   const isGrouped = isMain || isWorktree;
 
+  // Extract just the last folder segment from the actual path for a clean display
+  const lastFolderName = project.actual_path
+    ? project.actual_path.split(/[\\/]/).filter(Boolean).pop() || project.name
+    : project.name;
+
   const displayName = isMain
     ? t("project.main", "main")
     : isWorktree
       ? getWorktreeLabel(project.actual_path)
-      : project.name;
+      : lastFolderName;
 
   return (
     <div

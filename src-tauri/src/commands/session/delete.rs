@@ -49,14 +49,14 @@ pub async fn delete_session(file_path: String) -> Result<DeleteSessionResult, St
     validate_delete_path(&file_path)?;
 
     // 3. Delete the JSONL file
-    fs::remove_file(&file_path_buf)
-        .map_err(|e| format!("Failed to delete session file: {e}"))?;
+    fs::remove_file(&file_path_buf).map_err(|e| format!("Failed to delete session file: {e}"))?;
 
     // 4. Delete companion directory if it exists (same name without .jsonl extension)
     let companion_dir = file_path_buf.with_extension("");
     let companion_dir_deleted = if companion_dir.is_dir() {
-        fs::remove_dir_all(&companion_dir)
-            .map_err(|e| format!("Session file deleted but failed to remove companion directory: {e}"))?;
+        fs::remove_dir_all(&companion_dir).map_err(|e| {
+            format!("Session file deleted but failed to remove companion directory: {e}")
+        })?;
         true
     } else {
         false
@@ -123,12 +123,15 @@ fn validate_delete_path(file_path: &str) -> Result<(), String> {
         .canonicalize()
         .map_err(|e| format!("Failed to resolve path: {e}"))?;
 
-    let home_dir = dirs::home_dir()
-        .ok_or_else(|| "Cannot determine home directory".to_string())?;
+    let home_dir = dirs::home_dir().ok_or_else(|| "Cannot determine home directory".to_string())?;
 
     let claude_dir = home_dir.join(".claude");
 
-    if !canonical_path.starts_with(&claude_dir) {
+    // Canonicalize claude_dir too so both paths use the same format
+    // (on Windows, canonicalize adds \\?\ prefix)
+    let canonical_claude_dir = claude_dir.canonicalize().unwrap_or(claude_dir);
+
+    if !canonical_path.starts_with(&canonical_claude_dir) {
         return Err("File path must be within ~/.claude directory".to_string());
     }
 

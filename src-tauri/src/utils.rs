@@ -51,9 +51,23 @@ pub fn find_line_starts(data: &[u8]) -> Vec<usize> {
 
 pub fn extract_project_name(raw_project_name: &str) -> String {
     if raw_project_name.starts_with('-') {
+        // Unix format: -Users-jack-my-project
         let parts: Vec<&str> = raw_project_name.splitn(4, '-').collect();
         if parts.len() == 4 {
             parts[3].to_string()
+        } else {
+            raw_project_name.to_string()
+        }
+    } else if raw_project_name.len() >= 3
+        && raw_project_name.as_bytes()[0].is_ascii_alphabetic()
+        && raw_project_name[1..].starts_with("--")
+    {
+        // Windows format: C--Users-Username-path
+        // Skip "X--" prefix, then skip first 2 segments (Users-Username-)
+        let after_drive = &raw_project_name[3..]; // "Users-Username-path"
+        let parts: Vec<&str> = after_drive.splitn(3, '-').collect();
+        if parts.len() == 3 {
+            parts[2].to_string() // "path" (everything after Users-Username-)
         } else {
             raw_project_name.to_string()
         }
@@ -94,15 +108,28 @@ pub fn decode_project_path(session_storage_path: &str) -> String {
 
     // 2. Fallback: decode from encoded directory name
     const MARKER: &str = ".claude/projects/";
-    if let Some(marker_pos) = session_storage_path.find(MARKER) {
-        let encoded = &session_storage_path[marker_pos + MARKER.len()..];
+    // Also check Windows-style backslash marker
+    const MARKER_WIN: &str = ".claude\\projects\\";
+    let marker_pos = session_storage_path
+        .find(MARKER)
+        .or_else(|| session_storage_path.find(MARKER_WIN));
+    let marker_len = if session_storage_path.contains(MARKER) {
+        MARKER.len()
+    } else {
+        MARKER_WIN.len()
+    };
+
+    if let Some(pos) = marker_pos {
+        let encoded = &session_storage_path[pos + marker_len..];
+
+        // Unix format: -Users-jack-my-project
         if let Some(stripped) = encoded.strip_prefix('-') {
             // Try filesystem-based decoding (recursive)
             if let Some(path) = decode_with_filesystem_check(stripped) {
                 return path;
             }
 
-            // Fallback: use heuristic decoding (still uses original encoded with dash)
+            // Fallback: use heuristic decoding
             let parts: Vec<&str> = encoded.splitn(4, '-').collect();
             if parts.len() >= 4 {
                 return format!("/{}/{}/{}", parts[1], parts[2], parts[3]);
@@ -110,6 +137,36 @@ pub fn decode_project_path(session_storage_path: &str) -> String {
                 return format!("/{}/{}", parts[1], parts[2]);
             } else if parts.len() == 2 {
                 return format!("/{}", parts[1]);
+            }
+        }
+
+        // Windows format: C--Users-Username-path
+        if encoded.len() >= 3
+            && encoded.as_bytes()[0].is_ascii_alphabetic()
+            && encoded[1..].starts_with("--")
+        {
+            let drive_letter = &encoded[..1];
+            let after_drive = &encoded[3..]; // Skip "X--"
+
+            // Try filesystem-based decoding with Windows drive as base
+            let win_base = format!("{drive_letter}:\\");
+            if let Some(path) =
+                decode_recursive(after_drive, win_base.trim_end_matches('\\'))
+            {
+                return path;
+            }
+
+            // Fallback: heuristic decoding for Windows
+            let parts: Vec<&str> = after_drive.splitn(3, '-').collect();
+            if parts.len() >= 3 {
+                return format!(
+                    "{}:\\{}\\{}\\{}",
+                    drive_letter, parts[0], parts[1], parts[2]
+                );
+            } else if parts.len() == 2 {
+                return format!("{}:\\{}\\{}", drive_letter, parts[0], parts[1]);
+            } else if parts.len() == 1 {
+                return format!("{}:\\{}", drive_letter, parts[0]);
             }
         }
     }
@@ -161,10 +218,12 @@ fn decode_recursive_inner(encoded: &str, base_path: &str, depth: usize) -> Optio
             continue;
         }
 
+        // Use backslash on Windows-style base paths (e.g., "C:\Users")
+        let sep = if base_path.contains('\\') { "\\" } else { "/" };
         let candidate = if base_path.is_empty() {
             format!("/{segment}")
         } else {
-            format!("{base_path}/{segment}")
+            format!("{base_path}{sep}{segment}")
         };
 
         // Use symlink_metadata to avoid following symlinks
@@ -179,7 +238,7 @@ fn decode_recursive_inner(encoded: &str, base_path: &str, depth: usize) -> Optio
             }
 
             // First try: remaining as a single leaf (no more splitting needed)
-            let full_path = format!("{candidate}/{remaining}");
+            let full_path = format!("{candidate}{sep}{remaining}");
             let full_path_is_real = std::fs::symlink_metadata(&full_path)
                 .map(|m| !m.file_type().is_symlink())
                 .unwrap_or(false);
@@ -196,7 +255,8 @@ fn decode_recursive_inner(encoded: &str, base_path: &str, depth: usize) -> Optio
 
     // No hyphen worked as separator — treat entire encoded as a single segment
     if !base_path.is_empty() {
-        let full_path = format!("{base_path}/{encoded}");
+        let sep = if base_path.contains('\\') { "\\" } else { "/" };
+        let full_path = format!("{base_path}{sep}{encoded}");
         if Path::new(&full_path).exists() {
             return Some(full_path);
         }

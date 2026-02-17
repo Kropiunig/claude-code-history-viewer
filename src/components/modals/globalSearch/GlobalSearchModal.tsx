@@ -8,7 +8,9 @@ import {
     CornerDownLeft,
     X,
     Loader2,
+    Play,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Dialog, DialogContent, Input } from "@/components/ui";
 import { useAppStore } from "@/store/useAppStore";
 import type { ClaudeMessage, ClaudeSession, ContentItem } from "@/types";
@@ -181,6 +183,23 @@ export const GlobalSearchModal = ({
             onClose();
         },
         [projects, sessions, selectProject, selectSession, onClose],
+    );
+
+    // Continue session in terminal
+    const handleContinueResult = useCallback(
+        async (e: React.MouseEvent, result: GlobalSearchResult) => {
+            e.stopPropagation();
+            const sessionId = result.sessionId;
+            if (!sessionId) return;
+            try {
+                await invoke("resume_session", { sessionId });
+                toast.success(t("session.continue.success", "Opened in terminal"));
+            } catch (error) {
+                toast.error(t("session.continue.error", "Failed to open terminal"));
+                console.error("Failed to resume session:", error);
+            }
+        },
+        [t],
     );
 
     // Keyboard navigation
@@ -443,6 +462,16 @@ export const GlobalSearchModal = ({
                                                                 )}
                                                             </p>
                                                         </div>
+                                                        {result.sessionId && (
+                                                            <button
+                                                                onClick={(e) => handleContinueResult(e, result)}
+                                                                className="shrink-0 p-1.5 rounded hover:bg-accent/20 text-muted-foreground hover:text-accent transition-colors self-center"
+                                                                title={t("session.continue.menuItem", "Continue in terminal")}
+                                                                aria-label={t("session.continue.menuItem", "Continue in terminal")}
+                                                            >
+                                                                <Play className="w-3.5 h-3.5" />
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </button>
                                             );

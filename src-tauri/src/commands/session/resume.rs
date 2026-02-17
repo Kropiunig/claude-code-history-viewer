@@ -32,12 +32,15 @@ pub async fn resume_session(session_id: String) -> Result<(), String> {
 }
 
 /// Opens a platform-specific terminal with the given command.
+/// Clears the CLAUDECODE env var so `claude` doesn't think it's a nested session.
 fn open_terminal_with_command(cmd: &str) -> Result<(), String> {
     #[cfg(target_os = "windows")]
     {
         // On Windows, open a new cmd.exe window with the command
+        // Unset CLAUDECODE so claude doesn't reject the nested session
         Command::new("cmd")
             .args(["/c", "start", "cmd", "/k", cmd])
+            .env_remove("CLAUDECODE")
             .spawn()
             .map_err(|e| format!("Failed to open terminal: {e}"))?;
     }
@@ -45,12 +48,15 @@ fn open_terminal_with_command(cmd: &str) -> Result<(), String> {
     #[cfg(target_os = "macos")]
     {
         // On macOS, use osascript to open Terminal.app
+        // Prefix command with unset CLAUDECODE to avoid nested session check
+        let full_cmd = format!("unset CLAUDECODE; {cmd}");
         let script = format!(
             "tell application \"Terminal\"\n  activate\n  do script \"{}\"\nend tell",
-            cmd.replace('\\', "\\\\").replace('"', "\\\"")
+            full_cmd.replace('\\', "\\\\").replace('"', "\\\"")
         );
         Command::new("osascript")
             .args(["-e", &script])
+            .env_remove("CLAUDECODE")
             .spawn()
             .map_err(|e| format!("Failed to open terminal: {e}"))?;
     }
@@ -58,16 +64,23 @@ fn open_terminal_with_command(cmd: &str) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         // Try common terminal emulators in order of preference
+        // Prefix command with unset CLAUDECODE to avoid nested session check
+        let full_cmd = format!("unset CLAUDECODE; {cmd}");
         let terminals = [
-            ("x-terminal-emulator", vec!["-e", cmd]),
-            ("gnome-terminal", vec!["--", "bash", "-c", cmd]),
-            ("konsole", vec!["-e", cmd]),
-            ("xfce4-terminal", vec!["-e", cmd]),
-            ("xterm", vec!["-e", cmd]),
+            ("x-terminal-emulator", vec!["-e", &full_cmd]),
+            ("gnome-terminal", vec!["--", "bash", "-c", &full_cmd]),
+            ("konsole", vec!["-e", &full_cmd]),
+            ("xfce4-terminal", vec!["-e", &full_cmd]),
+            ("xterm", vec!["-e", &full_cmd]),
         ];
 
         for (terminal, args) in &terminals {
-            if Command::new(terminal).args(args).spawn().is_ok() {
+            if Command::new(terminal)
+                .args(args)
+                .env_remove("CLAUDECODE")
+                .spawn()
+                .is_ok()
+            {
                 return Ok(());
             }
         }

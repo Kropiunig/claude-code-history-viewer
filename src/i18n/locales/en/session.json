@@ -137,5 +137,14 @@
   "session.filter.sortNewestFirst": "Sort by newest first",
   "session.filter.sortOldestFirst": "Sort by oldest first",
   "session.filter.noResults": "No sessions match your search",
-  "session.filter.showingCount": "Showing {{count}} of {{total}} sessions"
+  "session.filter.showingCount": "Showing {{count}} of {{total}} sessions",
+  "session.delete.menuItem": "Delete session",
+  "session.delete.title": "Delete session?",
+  "session.delete.description": "This action cannot be undone.",
+  "session.delete.sessionLabel": "Session",
+  "session.delete.warning": "The session file and all associated data will be permanently deleted.",
+  "session.delete.confirm": "Delete",
+  "session.delete.deleting": "Deleting...",
+  "session.delete.success": "Session deleted",
+  "session.delete.error": "Failed to delete session"
 }

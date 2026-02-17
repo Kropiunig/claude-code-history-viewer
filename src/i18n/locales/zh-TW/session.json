@@ -137,5 +137,14 @@
   "session.filter.sortNewestFirst": "依最新排序",
   "session.filter.sortOldestFirst": "依最舊排序",
   "session.filter.noResults": "沒有符合的工作階段",
-  "session.filter.showingCount": "顯示 {{count}}/{{total}} 個工作階段"
+  "session.filter.showingCount": "顯示 {{count}}/{{total}} 個工作階段",
+  "session.delete.menuItem": "刪除工作階段",
+  "session.delete.title": "確定刪除工作階段？",
+  "session.delete.description": "此操作無法復原。",
+  "session.delete.sessionLabel": "工作階段",
+  "session.delete.warning": "工作階段檔案及所有相關資料將被永久刪除。",
+  "session.delete.confirm": "刪除",
+  "session.delete.deleting": "刪除中...",
+  "session.delete.success": "工作階段已刪除",
+  "session.delete.error": "刪除工作階段失敗"
 }

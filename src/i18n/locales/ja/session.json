@@ -137,5 +137,14 @@
   "session.filter.sortNewestFirst": "新しい順に並べ替え",
   "session.filter.sortOldestFirst": "古い順に並べ替え",
   "session.filter.noResults": "検索に一致するセッションがありません",
-  "session.filter.showingCount": "{{total}}件中{{count}}件を表示"
+  "session.filter.showingCount": "{{total}}件中{{count}}件を表示",
+  "session.delete.menuItem": "セッションを削除",
+  "session.delete.title": "セッションを削除しますか？",
+  "session.delete.description": "この操作は元に戻せません。",
+  "session.delete.sessionLabel": "セッション",
+  "session.delete.warning": "セッションファイルと関連するすべてのデータが完全に削除されます。",
+  "session.delete.confirm": "削除",
+  "session.delete.deleting": "削除中...",
+  "session.delete.success": "セッションが削除されました",
+  "session.delete.error": "セッションの削除に失敗しました"
 }

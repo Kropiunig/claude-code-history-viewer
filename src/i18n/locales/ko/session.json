@@ -137,5 +137,14 @@
   "session.filter.sortNewestFirst": "최신순 정렬",
   "session.filter.sortOldestFirst": "오래된 순 정렬",
   "session.filter.noResults": "검색 결과가 없습니다",
-  "session.filter.showingCount": "{{total}}개 중 {{count}}개 표시"
+  "session.filter.showingCount": "{{total}}개 중 {{count}}개 표시",
+  "session.delete.menuItem": "세션 삭제",
+  "session.delete.title": "세션을 삭제하시겠습니까?",
+  "session.delete.description": "이 작업은 되돌릴 수 없습니다.",
+  "session.delete.sessionLabel": "세션",
+  "session.delete.warning": "세션 파일과 모든 관련 데이터가 영구적으로 삭제됩니다.",
+  "session.delete.confirm": "삭제",
+  "session.delete.deleting": "삭제 중...",
+  "session.delete.success": "세션이 삭제되었습니다",
+  "session.delete.error": "세션 삭제에 실패했습니다"
 }

@@ -137,5 +137,14 @@
   "session.filter.sortNewestFirst": "按最新排序",
   "session.filter.sortOldestFirst": "按最旧排序",
   "session.filter.noResults": "没有匹配的会话",
-  "session.filter.showingCount": "显示 {{count}}/{{total}} 个会话"
+  "session.filter.showingCount": "显示 {{count}}/{{total}} 个会话",
+  "session.delete.menuItem": "删除会话",
+  "session.delete.title": "确定删除会话？",
+  "session.delete.description": "此操作无法撤销。",
+  "session.delete.sessionLabel": "会话",
+  "session.delete.warning": "会话文件及所有相关数据将被永久删除。",
+  "session.delete.confirm": "删除",
+  "session.delete.deleting": "删除中...",
+  "session.delete.success": "会话已删除",
+  "session.delete.error": "删除会话失败"
 }

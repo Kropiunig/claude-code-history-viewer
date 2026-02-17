@@ -12,6 +12,7 @@ import {
   RotateCcw,
   Link2,
   Terminal,
+  Trash2,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
@@ -35,6 +36,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { NativeRenameDialog } from "@/components/NativeRenameDialog";
+import { DeleteSessionDialog } from "@/components/DeleteSessionDialog";
 
 interface SessionItemProps {
   session: ClaudeSession;
@@ -56,6 +58,7 @@ export const SessionItem: React.FC<SessionItemProps> = ({
   const [editValue, setEditValue] = useState("");
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   const [isNativeRenameOpen, setIsNativeRenameOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   // Local state for summary that can be updated after native rename
   const [localSummary, setLocalSummary] = useState(session.summary);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -179,6 +182,29 @@ export const SessionItem: React.FC<SessionItemProps> = ({
     },
     []
   );
+
+  // Handle delete action
+  const handleDeleteClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setIsContextMenuOpen(false);
+      setIsDeleteDialogOpen(true);
+    },
+    []
+  );
+
+  // Handle delete success — refresh sessions list
+  const handleDeleteSuccess = useCallback(async () => {
+    const { selectedProject, selectProject, selectedSession, setSelectedSession } = useAppStore.getState();
+    // Clear selection if the deleted session was selected
+    if (selectedSession?.session_id === session.session_id) {
+      setSelectedSession(null);
+    }
+    // Reload sessions for the current project
+    if (selectedProject) {
+      await selectProject(selectedProject);
+    }
+  }, [session.session_id]);
 
   // Handle native rename success
   const handleNativeRenameSuccess = useCallback(
@@ -371,6 +397,14 @@ export const SessionItem: React.FC<SessionItemProps> = ({
                     <Terminal className="w-3 h-3 mr-2" />
                     {t("session.nativeRename.menuItem", "Rename in Claude Code")}
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleDeleteClick}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="w-3 h-3 mr-2" />
+                    {t("session.delete.menuItem", "Delete session")}
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </>
@@ -420,6 +454,15 @@ export const SessionItem: React.FC<SessionItemProps> = ({
         filePath={session.file_path}
         currentName={localSummary || ""}
         onSuccess={handleNativeRenameSuccess}
+      />
+
+      {/* Delete Session Dialog */}
+      <DeleteSessionDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        filePath={session.file_path}
+        sessionName={displayName || ""}
+        onSuccess={handleDeleteSuccess}
       />
     </div>
   );

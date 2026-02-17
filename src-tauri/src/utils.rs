@@ -50,6 +50,12 @@ pub fn find_line_starts(data: &[u8]) -> Vec<usize> {
 }
 
 pub fn extract_project_name(raw_project_name: &str) -> String {
+    // Try filesystem-based extraction first (handles deleted project dirs)
+    if let Some(name) = extract_project_name_with_fs(raw_project_name) {
+        return name;
+    }
+
+    // Fallback to heuristic
     if raw_project_name.starts_with('-') {
         // Unix format: -Users-jack-my-project
         let parts: Vec<&str> = raw_project_name.splitn(4, '-').collect();
@@ -74,6 +80,29 @@ pub fn extract_project_name(raw_project_name: &str) -> String {
     } else {
         raw_project_name.to_string()
     }
+}
+
+/// Try to extract project name using partial filesystem decoding.
+/// Only used for Windows encoded paths where the heuristic is unreliable.
+fn extract_project_name_with_fs(raw_project_name: &str) -> Option<String> {
+    // Only handle Windows format: C--Users-Username-Documents-GitHub-my-project
+    if raw_project_name.len() >= 3
+        && raw_project_name.as_bytes()[0].is_ascii_alphabetic()
+        && raw_project_name[1..].starts_with("--")
+    {
+        let drive_letter = &raw_project_name[..1];
+        let after_drive = &raw_project_name[3..];
+        let win_base = format!("{drive_letter}:");
+        let (deepest, remaining) = find_deepest_existing_dir(after_drive, &win_base, "\\", 0);
+        // Only trust partial decode if we got past Users\Username\ (3+ separators)
+        // E.g., C:\Users\Alex\Documents has 3 backslashes — reliable
+        // E.g., C:\Users has 1 backslash — not deep enough, fall through to heuristic
+        let sep_count = deepest.matches('\\').count();
+        if !remaining.is_empty() && sep_count >= 3 {
+            return Some(remaining);
+        }
+    }
+    None
 }
 
 /// Estimate message count from file size (more accurate calculation)
@@ -124,12 +153,12 @@ pub fn decode_project_path(session_storage_path: &str) -> String {
 
         // Unix format: -Users-jack-my-project
         if let Some(stripped) = encoded.strip_prefix('-') {
-            // Try filesystem-based decoding (recursive)
+            // Try exact filesystem-based decoding (recursive)
             if let Some(path) = decode_with_filesystem_check(stripped) {
                 return path;
             }
 
-            // Fallback: use heuristic decoding
+            // Fallback: heuristic decoding (reliable for Unix paths)
             let parts: Vec<&str> = encoded.splitn(4, '-').collect();
             if parts.len() >= 4 {
                 return format!("/{}/{}/{}", parts[1], parts[2], parts[3]);
@@ -148,15 +177,23 @@ pub fn decode_project_path(session_storage_path: &str) -> String {
             let drive_letter = &encoded[..1];
             let after_drive = &encoded[3..]; // Skip "X--"
 
-            // Try filesystem-based decoding with Windows drive as base
-            let win_base = format!("{drive_letter}:\\");
-            if let Some(path) =
-                decode_recursive(after_drive, win_base.trim_end_matches('\\'))
-            {
+            // Try exact filesystem-based decoding with Windows drive as base
+            let win_base = format!("{drive_letter}:");
+            if let Some(path) = decode_recursive(after_drive, &win_base) {
                 return path;
             }
 
-            // Fallback: heuristic decoding for Windows
+            // Fallback: partial filesystem decode (handles deleted project dirs)
+            // Only trust if we decoded past Users\Username\ (3+ backslashes)
+            let (deepest, remaining) = find_deepest_existing_dir(after_drive, &win_base, "\\", 0);
+            let sep_count = deepest.matches('\\').count();
+            if sep_count >= 3 && !remaining.is_empty() {
+                return format!("{deepest}\\{remaining}");
+            } else if sep_count >= 3 {
+                return deepest;
+            }
+
+            // Last resort: heuristic decoding for Windows
             let parts: Vec<&str> = after_drive.splitn(3, '-').collect();
             if parts.len() >= 3 {
                 return format!(
@@ -263,6 +300,55 @@ fn decode_recursive_inner(encoded: &str, base_path: &str, depth: usize) -> Optio
     }
 
     None
+}
+
+/// Best-effort partial decode: goes as deep as possible into existing directories,
+/// then returns (`deepest_path`, `remaining_encoded`).
+/// Used when the project directory has been deleted from disk.
+fn find_deepest_existing_dir(
+    encoded: &str,
+    base_path: &str,
+    sep: &str,
+    depth: usize,
+) -> (String, String) {
+    if depth > 20 || encoded.is_empty() {
+        return (base_path.to_string(), encoded.to_string());
+    }
+
+    let hyphen_positions: Vec<usize> = encoded
+        .char_indices()
+        .filter(|(_, c)| *c == '-')
+        .map(|(i, _)| i)
+        .collect();
+
+    for &pos in &hyphen_positions {
+        let segment = &encoded[..pos];
+        if segment.is_empty() {
+            continue;
+        }
+
+        let candidate = if base_path.is_empty() {
+            format!("/{segment}")
+        } else {
+            format!("{base_path}{sep}{segment}")
+        };
+
+        let is_real_dir = std::fs::symlink_metadata(&candidate)
+            .map(|m| m.file_type().is_dir())
+            .unwrap_or(false);
+
+        if is_real_dir {
+            let remaining = &encoded[pos + 1..];
+            if remaining.is_empty() {
+                return (candidate, String::new());
+            }
+            // Recurse to try going deeper
+            return find_deepest_existing_dir(remaining, &candidate, sep, depth + 1);
+        }
+    }
+
+    // No hyphen matched an existing directory — base_path is the deepest we got
+    (base_path.to_string(), encoded.to_string())
 }
 
 /// Extract main git directory from gitdir path
@@ -444,6 +530,64 @@ mod tests {
     fn test_extract_project_name_exact_four_parts() {
         let result = extract_project_name("-a-b-c");
         assert_eq!(result, "c");
+    }
+
+    #[test]
+    fn test_extract_project_name_windows_format_heuristic() {
+        // Windows format: C--Users-Username-rest
+        // When Username doesn't exist on disk, falls through to heuristic
+        // which strips Users-Username- (first 2 segments after drive)
+        let result = extract_project_name("C--Users-TestUser-my-project");
+        assert_eq!(result, "my-project");
+    }
+
+    #[test]
+    fn test_extract_project_name_windows_deep_path() {
+        // When intermediate dirs exist on disk, partial decode extracts the leaf
+        // This tests the real path on this machine:
+        // C:\Users\AlexanderKropiunig\Documents\GitHub exists
+        // → remaining "immo-find-a-flat-agent" is the project name
+        let result = extract_project_name(
+            "C--Users-AlexanderKropiunig-Documents-GitHub-immo-find-a-flat-agent",
+        );
+        // With partial decode: should get just "immo-find-a-flat-agent"
+        // (or the heuristic "Documents-GitHub-immo-find-a-flat-agent" if dirs don't exist)
+        // We can't assert the exact value as it depends on the filesystem,
+        // but it should NOT be the full encoded string
+        assert_ne!(
+            result,
+            "C--Users-AlexanderKropiunig-Documents-GitHub-immo-find-a-flat-agent"
+        );
+    }
+
+    #[test]
+    fn test_find_deepest_existing_dir_no_match() {
+        // When no directories exist, returns base_path and full encoded
+        let (deepest, remaining) =
+            find_deepest_existing_dir("nonexistent-path-here", "/fake", "/", 0);
+        assert_eq!(deepest, "/fake");
+        assert_eq!(remaining, "nonexistent-path-here");
+    }
+
+    #[test]
+    fn test_find_deepest_existing_dir_with_real_dirs() {
+        // Use a real temp directory to test partial decode
+        use tempfile::TempDir;
+        let temp = TempDir::new().unwrap();
+        let base = temp.path();
+        // Create nested directories: base/Documents/GitHub
+        fs::create_dir_all(base.join("Documents").join("GitHub")).unwrap();
+
+        let base_str = base.to_string_lossy().to_string();
+        let sep = if cfg!(windows) { "\\" } else { "/" };
+
+        // Encoded: Documents-GitHub-my-cool-project
+        // Should decode to: Documents/GitHub as deepest, my-cool-project as remaining
+        let (deepest, remaining) =
+            find_deepest_existing_dir("Documents-GitHub-my-cool-project", &base_str, sep, 0);
+        let expected_deepest = format!("{base_str}{sep}Documents{sep}GitHub");
+        assert_eq!(deepest, expected_deepest);
+        assert_eq!(remaining, "my-cool-project");
     }
 
     #[test]

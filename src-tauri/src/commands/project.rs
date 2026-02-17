@@ -4,9 +4,14 @@ use crate::utils::{
 };
 use chrono::{DateTime, Utc};
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use walkdir::WalkDir;
+
+/// Check if a file path is inside a subagents directory (internal Claude Code files)
+fn is_subagent_file(path: &Path) -> bool {
+    path.components().any(|c| c.as_os_str() == "subagents")
+}
 
 #[tauri::command]
 pub async fn get_git_log(actual_path: String, limit: usize) -> Result<Vec<GitCommit>, String> {
@@ -135,6 +140,7 @@ pub async fn scan_projects(claude_path: String) -> Result<Vec<ClaudeProject>, St
             .into_iter()
             .filter_map(std::result::Result::ok)
             .filter(|e| e.path().extension().and_then(|s| s.to_str()) == Some("jsonl"))
+            .filter(|e| !is_subagent_file(e.path()))
         {
             session_count += 1;
 

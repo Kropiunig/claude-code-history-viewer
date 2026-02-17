@@ -706,11 +706,12 @@ pub async fn load_project_sessions(
     let mut cache = load_cache(&project_path);
     let mut cache_updated = false;
 
-    // 2. Collect all JSONL file paths
+    // 2. Collect all JSONL file paths (skip subagent files)
     let file_paths: Vec<PathBuf> = WalkDir::new(&project_path)
         .into_iter()
         .filter_map(std::result::Result::ok)
         .filter(|e| e.path().extension().and_then(|s| s.to_str()) == Some("jsonl"))
+        .filter(|e| !e.path().components().any(|c| c.as_os_str() == "subagents"))
         .map(|e| e.path().to_path_buf())
         .collect();
 
